@@ -53,6 +53,14 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+@theme {
+  --font-avenir: "Avenir", "Bodoni MT", "Baskerville", "Times New Roman", serif;
+  --font-blonden: "Blonden", serif;
+  --font-campeno: "Campeno", serif;
+  --font-galdien: "Galdien", serif;
+  --font-helvetica: "Helvetica", serif;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

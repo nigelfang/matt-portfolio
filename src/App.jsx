@@ -1,7 +1,8 @@
-import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-dom";
+import { HashRouter as Router, Routes, Route, NavLink } from "react-router-dom";
 import Home from "./pages/Home";
 import Sketch from "./pages/Sketch";
 import Work from "./pages/Work";
+import logo from "./assets/logo.png";
 
 export default function App() {
   return (
@@ -9,12 +10,16 @@ export default function App() {
       <div className="min-h-screen flex flex-col overflow-x-hidden w-screen bg-white">
       <nav className="bg-white text-black p-4 flex justify-between items-center fixed w-screen top-0 z-50 shadow">
         {/* Artist name on the left */}
-        <div className="text-2xl font-bold tracking-wide">
-          Matt Wu
+        <div className="flex items-center">
+          <img 
+            src={logo} 
+            alt="Artist Logo" 
+            className="h-10 w-auto object-contain"
+          />
         </div>
 
         {/* Links on the right */}
-        <div className="flex gap-8">
+        <div className="flex gap-8 px-3 py-2">
           <NavLink
             to="/"
             className={({ isActive }) =>
