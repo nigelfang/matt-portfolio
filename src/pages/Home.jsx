@@ -9,7 +9,30 @@ import img5 from "../assets/boat.png";
 export default function Home() {
   const images = [img1, img2, img3, img4, img5];
   const [activeIndex, setActiveIndex] = useState(null);
+    const swipeThreshold = 50; // Minimum swipe distance in pixels
+  // swipe controls
+  const [touchStartX, setTouchStartX] = useState(null);
 
+  const close = () => setActiveIndex(null);
+  const next = () => setActiveIndex((i) => (i + 1) % images.length);
+  const prev = () =>
+    setActiveIndex((i) => (i - 1 + images.length) % images.length);
+
+  const onTouchStart = (e) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const onTouchEnd = (e) => {
+    if (touchStartX === null) return;
+
+    const touchEndX = e.changedTouches[0].clientX;
+    const delta = touchStartX - touchEndX;
+
+    if (delta > SWIPE_THRESHOLD) next();
+    if (delta < -SWIPE_THRESHOLD) prev();
+
+    setTouchStartX(null);
+  };
   // Keyboard controls
   useEffect(() => {
     if (activeIndex === null) return;
@@ -33,6 +56,27 @@ export default function Home() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [activeIndex, images.length]);
+
+    // Preload all images
+  useEffect(() => {
+    images.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, [images]);
+
+  // Preload neighbors
+  useEffect(() => {
+    if (activeIndex === null) return;
+
+    const preload = (i) => {
+      const img = new Image();
+      img.src = images[i];
+    };
+
+    preload((activeIndex + 1) % images.length);
+    preload((activeIndex - 1 + images.length) % images.length);
+  }, [activeIndex, images]);
 
   return (
     <section className="w-full bg-white relative">
@@ -66,28 +110,38 @@ export default function Home() {
       {/* FULLSCREEN MODAL */}
       {activeIndex !== null && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
-          onClick={() => setActiveIndex(null)}
+          className="fixed inset-0 z-50 bg-black flex items-center justify-center"
+          onClick={close}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
         >
           <img
             src={images[activeIndex]}
-            alt={`Artwork ${activeIndex + 1}`}
-            className="max-w-[95vw] max-h-[95vh] object-contain"
+            alt=""
+            className="max-w-full max-h-full object-contain"
             onClick={(e) => e.stopPropagation()}
+            draggable={false}
           />
 
-          {/* Close button */}
+          {/* Optional arrows (desktop hint) */}
           <button
-            className="absolute top-4 right-4 text-white text-3xl"
-            onClick={() => setActiveIndex(null)}
+            className="absolute left-4 text-white text-4xl hidden md:block"
+            onClick={(e) => {
+              e.stopPropagation();
+              prev();
+            }}
           >
-            ×
+            ‹
           </button>
-
-          {/* Navigation hint */}
-          <div className="absolute bottom-6 text-gray-300 text-sm">
-            ← / → navigate · ESC close
-          </div>
+          <button
+            className="absolute right-4 text-white text-4xl hidden md:block"
+            onClick={(e) => {
+              e.stopPropagation();
+              next();
+            }}
+          >
+            ›
+          </button>
         </div>
       )}
     </section>
